@@ -23,6 +23,7 @@ stringOp good name = case name of
   "unlexgreek" -> Just $ appUnlexer unlexAGreek
   "unlexnone"  -> Just id
   "unlexid"    -> Just id
+  "uncomment"  -> Just $ dropComment --appUnlexer (unlines . map (dropComment . words) . lines)
   "unwords"    -> Just $ appUnlexer unwords
   "to_html"    -> Just wrapHTML
   _            -> transliterate name
@@ -447,3 +448,12 @@ isMajorPunct = flip elem ".?!"
 isMinorPunct = flip elem ",:;"
 isParen = flip elem "()[]{}"
 isClosing = flip elem ")]}"
+
+-- | Remove trailing comment -- HL
+
+dropComment :: String -> String
+dropComment xs = fst (useful ([],xs)) where
+  useful (xs, []) = (reverse xs,[])
+  useful (xs,'-':('-':ys)) = (reverse xs,[])
+  useful ('-':xs,'-':ys) = (reverse xs,[])
+  useful (xs,y:ys) = useful (y:xs,ys)

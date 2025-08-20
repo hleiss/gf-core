@@ -134,6 +134,7 @@ execute1' s0 =
       -- other special commands, working on GFEnv
          "dc":ws  -> define_command ws
          "dt":ws  -> define_tree ws
+         "sc":_   -> continue           -- HL, to skip without newline
       -- ordinary commands
          _        -> do env <- gets commandenv
                         interpretCommandLine env s0

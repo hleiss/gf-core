@@ -50,6 +50,7 @@ pipeWithMessage es msg = Piped (Exprs es,msg)
 pipeMessage msg        = Piped (Exprs [],msg)
 pipeExprs   es         = Piped (Exprs es,[]) -- only used in emptyCommandInfo
 void                   = Piped (Exprs [],"")
+skip                   = Piped (Strings [],"") -- HL: use putStrE instead of putStrLnE
 
 stringAsExpr = H.ELit . H.LStr -- should be a pattern macro
 

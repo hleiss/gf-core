@@ -7,7 +7,7 @@ import GF.Command.CommandInfo
 import GF.Command.Abstract
 import GF.Command.Parse
 import PGF.Internal(Expr(..))
-import GF.Infra.UseIO(putStrLnE)
+import GF.Infra.UseIO(putStrLnE,putStrE) -- HL putStrE
 
 import Control.Monad(when)
 import qualified Data.Map as Map
@@ -32,8 +32,10 @@ interpretCommandLine env line =
     Nothing    -> putStrLnE $ "command not parsed: "++line
 
 interpretPipe env cs = do
-     Piped v@(_,s) <- intercs cs void
-     putStrLnE s
+     Piped v@(arg,s) <- intercs cs void
+     case (arg,s) of
+       (Strings [],"") -> putStrE "" -- HL: skip-case: write "" without newline
+       _ -> putStrLnE s
      return ()
   where
    intercs [] args = return args
@@ -42,10 +44,13 @@ interpretPipe env cs = do
    interc comm@(Command co opts arg) args =
      case co of
        '%':f -> case Map.lookup f (commandmacros env) of
+         -- HL: to skip command lines %f ... in .gfs files,
+         -- if f was before (re)defined by 'define_command f sc' in the .gfs file
+         Just [[Command sc [] ANoArg]] -> return skip
          Just css ->
            do args <- getCommandTrees env False arg args
               mapM_ (interpretPipe env) (appLine args css)
-              return void
+              return void -- HL: skip, was: void
          Nothing  -> do
            putStrLnE $ "command macro " ++ co ++ " not interpreted"
            return void

@@ -208,6 +208,12 @@ commonCommands = fmap (mapCommandExec liftSIO) $ Map.fromList [
        ("append","append to file, instead of overwriting it")
        ],
      flags = [("file","the output filename")]
+     }),
+  ("sc", emptyCommandInfo {
+     longname = "skip_command",
+     synopsis = "do not insert a newline (when executing sc .. in .gfs files)",
+     needsTypeCheck = False,
+     exec = \ _ args -> return skip -- CommandInfo.skip = Piped (Strings [],"") HL
      })
   ]
  where
@@ -251,6 +257,7 @@ stringOpOptions = sort $ [
        ("unchars","unlexer that puts no spaces between tokens"),
        ("unlexgreek","unlexer de-normalizing ancient Greek accentuation"),
        ("unwords","unlexer that puts a single space between tokens (default)"),
+       ("uncomment","unlexer that removes trailing --comment from a string"),
        ("words","lexer that assumes tokens separated by spaces (default)")
        ] ++
       concat [
